@@ -1,0 +1,4 @@
+Page: contact Method: GET Url: https://www.romlex.hu/ajanlatkeres
+status_code:  200
+Page: contact Method: POST Url: https://www.romlex.hu/ajanlatkeres
+status_code:  200
