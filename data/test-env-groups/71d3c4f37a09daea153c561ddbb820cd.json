@@ -1,1 +1,1 @@
-{"id":"71d3c4f37a09daea153c561ddbb820cd","fullName":"api.test_login.TestLoginAPI#test_login_success","name":"test_login_success","status":"broken","testResultsByEnv":{"default":"95fbb437d5da7cc5bf6436daf6625ea1"}}
+{"id":"71d3c4f37a09daea153c561ddbb820cd","fullName":"api.test_login.TestLoginAPI#test_login_success","name":"test_login_success","status":"passed","testResultsByEnv":{"default":"9ec2f2760a95a792d16c194a08b57531"}}
