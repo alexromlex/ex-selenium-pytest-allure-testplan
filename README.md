@@ -1,4 +1,4 @@
-# Black-box Web Testing Automation Framework
+# Automated Website Testing (pytest, selenium, allure)
 
 [![GitHub Actions](https://img.shields.io/badge/GitHub-Actions-blue?logo=github-actions)](https://github.com/features/actions)
 [![Python](https://img.shields.io/badge/Python-3.x-blue?logo=python)](https://www.python.org/)
