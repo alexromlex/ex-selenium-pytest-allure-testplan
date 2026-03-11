@@ -1,0 +1,6 @@
+Form filling with valid data: 
+name: Ur
+email: g@example.ru
+telefon: 123
+honnan: Internetes kereső alapján
+captcha: 5

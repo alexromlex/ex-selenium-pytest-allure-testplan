@@ -1,0 +1,6 @@
+Form filling with valid data: 
+name: <script>alert('XSS')</script>
+email: g@example.ru
+telefon: (123) 456-7890
+honnan: Ismeröstől
+captcha: 15

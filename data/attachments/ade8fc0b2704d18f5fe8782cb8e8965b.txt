@@ -1,0 +1,1 @@
+Alert: Kérem töltsön ki minden kötelező mezőt!
