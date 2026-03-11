@@ -16,7 +16,7 @@ A robust black-box automated testing framework for web applications, built with 
 ## 🚀 Features
 
 - **Black-box Testing Approach** - Tests web applications from an end-user perspective + API
-- **Modern Tech Stack** - Python, Pytest, Selenium, and Allure 3
+- **Modern Tech Stack** - Python, Pytest, Selenium, and Allure Report 3
 - **Automated CI/CD** - GitHub Actions integration with secure token authentication
 - **Smart Test Planning** - Dynamic testplan generation based on metadata
 - **Comprehensive Reporting** - Allure reports with history tracking and environment filtering
@@ -30,7 +30,7 @@ A robust black-box automated testing framework for web applications, built with 
 |-----------|------------|
 | **Core Framework** | Python + Pytest |
 | **Browser Automation** | Selenium WebDriver |
-| **Reporting** | Allure 3 |
+| **Reporting** | Allure Report 3 |
 | **CI/CD** | GitHub Actions |
 | **Test Environment** | Linux (Debian) |
 | **Browser** | Chrome v146.0.7680.71 |
