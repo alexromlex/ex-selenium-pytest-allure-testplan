@@ -1,0 +1,160 @@
+name: Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      filter:
+        description: 'Filter string'
+        required: true
+        type: string
+
+jobs:
+  chrome-tests:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.10'
+
+      - name: PYTHON - Update testplan, metadata, found_tests by filter query
+        id: update_testplan
+        env:
+          FILTER_JSON: ${{ github.event.inputs.filter }}
+        run: |
+          python -c "
+          import json
+          import sys
+          import os
+          sys.path.insert(0, '.')
+          sys.path.insert(0, './testplan_generator')
+
+          from testplan_generator.filter_tests import TestFilter
+          from testplan_generator.extractor import extract_test
+          from testplan_generator.json_generator import check_update_file
+          
+          query = os.environ['FILTER_JSON']
+          query = json.loads(query)
+          # find tests
+          all_tests = extract_test('./tests')
+
+          # filter tests
+          filter_engine = TestFilter(all_tests)
+          found = filter_engine.filter(query)
+
+          if not found:
+              print(f'::stop::Tests not found by query {query}')
+              exit(0)
+
+          # update tests metadata
+          check_update_file('testplans/metadata.json', all_tests)
+
+          # update testplan
+          template = {'version': '1.0', 'tests': [{'id': el['id']} for el in found if el['id']]}
+          check_update_file('testplans/testplan.json', template)
+
+          # update found_tests
+          check_update_file('testplans/found_tests.json', {'tests': found, 'query': query})
+          "
+
+      - name: Update .env file
+        run: |
+          if [ -f .env ]; then
+            echo "JWT_USERNAME=${{ secrets.JWT_USERNAME }}" >> .env
+            echo "JWT_PASSWORD=${{ secrets.JWT_PASSWORD }}" >> .env
+            echo "FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true" >> .env
+          else
+            echo ".env file not found!"
+            exit 1
+          fi
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Extract Chrome version
+        id: chrome_version
+        run: |
+          CHROME_VERSION=$(grep BROWSER_VERSION .env | cut -d '=' -f2)
+          echo "CHROME_VERSION=$CHROME_VERSION" >> $GITHUB_ENV
+          echo "version=$CHROME_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Build and cache Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: allure-tests:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            CHROME_VERSION=${{ env.CHROME_VERSION }}
+      
+      - name: Run tests
+        continue-on-error: true
+        run: |
+          docker compose up -d
+          docker exec chrome-tests pytest -v --alluredir=/app/allure-results -c /app/tests/pytest.ini
+      
+      - name: Copy historical files for Pages
+        run: |
+          git fetch origin gh-pages --depth=1
+
+          git checkout origin/gh-pages -- history.jsonl 2>/dev/null
+          if [ -f history.jsonl ]; then
+            cat history.jsonl | docker exec -i chrome-tests sh -c 'cat > /app/history.jsonl'
+            echo "=== FILE history.jsonl REPLACED ==="
+          fi
+          
+      - name: Set Allure-report permissions
+        run: |
+          sudo chown -R runner:runner allure-report || \
+          chown -R runner:runner allure-report
+          chmod -R 775 allure-report
+          ls -la allure-report
+
+      - name: Generate Allure report
+        id: generate_report
+        run: |
+
+          echo "=== CHECKING ALLURE CONFIG ==="
+          docker exec chrome-tests cat /app/allurerc.js || echo "config not found"
+
+          echo "=== GENERATING REPORT ==="
+          docker exec chrome-tests allure generate /app/allure-results -o /app/allure-report
+
+          echo "=== CHECKING HISTORY FILE ==="
+          docker exec chrome-tests find /app -name "*.jsonl" 2>/dev/null || echo "no jsonl files"
+
+      - name: Create/Update files in allure-report
+        id: update_files
+        run: |
+          mkdir -p allure-report/custom-trigger
+          cp -r custom-trigger/* allure-report/custom-trigger/
+          echo "=== DIRECTORY custom-trigger COPIED ==="
+  
+          docker exec chrome-tests cat /app/history.jsonl > allure-report/history.jsonl
+          echo "=== FILE history.jsonl COPIED ==="
+          
+          cp testplans/found_tests.json allure-report/found_tests.json
+          echo "=== FILE found_tests.json COPIED ==="
+
+          cp testplans/metadata.json allure-report/metadata_tests.json
+          echo "=== FILE metadata.json COPIED ==="
+
+      - name: Inject script
+        run: |
+          sed -i 's|</body>|<script src="./custom-trigger/inject.js"></script></body>|' allure-report/index.html
+      
+
+      - name: Deploy to GitHub Pages
+        if: steps.generate_report.outcome != 'failure' && steps.update_files.outcome != 'failure'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./allure-report
+          destination_dir: ./
+          keep_files: false

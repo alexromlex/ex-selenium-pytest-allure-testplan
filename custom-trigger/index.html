@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Testplan generator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Testplan generator</h2>
+        <div class="section">
+            <h3>Find tests by filter</h3>
+            <div class="filter-section">
+                <input type="text" 
+                       id="filterInput" 
+                       placeholder="Enter filter in JSON"
+                       class="filter-input" value='{"id": {"eq": "22"}}'>
+                <button onclick="findTests()" class="primary-btn" id="findBtn">
+                    Find Tests
+                </button>
+            </div>
+            <div class="collapse-section">
+                <div class="collapse-header" onclick="toggleCollapse()">
+                    <span>How to use?</span>
+                    <span class="collapse-icon" id="collapseIcon">▼</span>
+                </div>
+                <div class="collapse-content" id="collapseContent">
+                    <div class="doc-text">
+                        <p><strong>You can filter by:</strong></p>
+                        <ul style="list-style: none;">
+                            <li><b>id</b> - @allure.id("22") => <code>{"id": {"eq": "22"}}</code></li>
+                            <li><b>name</b> - test name (function name: test_*) => <code>{"name": {"eq": "test_get_partners_negative"}}</code></li>
+                            <li><b>labels</b> - @allure.epic("Epic") => <code>{"labels": {"epic": {"eq": "API"}}}</code></li>
+                            <li><b>markers</b> - @pytest.mark.smoke => <code>{"markers": {"in": ["smoke"]}}</code></li>
+                            
+                        </ul>
+                        <p>Filter supports operators:
+                            <b>eq, neq</b> - for str valuest equal or not equal.
+                            <b>in, nin</b> - condition with array witch is include value or not.
+                            <b>exists</b> - boolean condition.
+                        </p>
+                        <h4>Filter strategies:</h4>
+                        <ul>
+                        <li>{key:value, key:value, ...} - filtered result by one condition with multiple params</li>
+                        <li>[{key:value}, {key:value, key:value, ...}, ...] - filtered result + filtered result +...</li>
+                        </ul>
+                        
+                        <p><strong>EXAPMLES:</strong></p>
+                        <ul style="list-style: none;">
+                            <li><b>Testplan: Smoke, Release_02, Regression and Epic=API, exclude test_get_partners_negative test:</b><br />
+                                <code>[
+                                    {"markers": {"in": ["Release_02", "smoke"]}},
+                                    {"labels": {"severity": {"in": ["blocker", "critical"]}}},
+                                    {"labels": {"epic": {"eq": "API"}}, "name": {"neq": "test_get_partners_negative"}}
+                                ]</code>
+                            </li>
+                        </ul>
+                        
+                        <p><em>For best formating use <a href="https://www.jsonformatter.org/" target="_blank">JSON formatter</a></em></p>
+                    </div>
+                </div>
+            </div>
+            <div class="status-container">
+                <div id="status" class="status"></div>
+                <div id="spinner" class="spinner-wrapper" style="display: none;">
+                    <div class="spinner-small"></div>
+                    <span class="ml-2">Running workflow...</span>
+                </div>
+            </div>
+            <div class="last-query" id="lastQuery"></div>
+            <div class="results-section" id="resultsSection">
+                <div class="results-header">
+                    <span>Testplan with:</span>
+                    <span class="results-count" id="resultsCount">0</span>
+                    <span style="margin-left: 8px;">test</span>
+                    <button onclick="runTests()" class="primary-btn flex-right" id="runBtn">
+                        Run testplan
+                    </button>
+                </div>
+                <div class="results-list" id="resultsList">
+                </div>
+            </div>
+        </div>
+
+        <div class="timestamp" id="timestamp"></div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>

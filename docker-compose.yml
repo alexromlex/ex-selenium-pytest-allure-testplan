@@ -1,0 +1,26 @@
+services:
+  selenium-tests:
+    build:
+      context: .
+      args:
+        CHROME_VERSION: ${BROWSER_VERSION}
+    container_name: chrome-tests
+    env_file:
+      - .env
+    environment:
+      - BROWSER=chrome
+    volumes:
+      - ./tests:/app/tests
+      - ./allurerc.js:/app/allurerc.js
+      - ./allure-results/chrome:/app/allure-results
+      - ./allure-report:/app/allure-report
+      - ./history.jsonl:/app/history.jsonl
+      - ./testplans/testplan.json:/app/${ALLURE_TESTPLAN_PATH}
+    command: tail -f /dev/null
+    networks:
+      - test-network
+    shm_size: 2gb  # For Chrome!
+
+networks:
+  test-network:
+    driver: bridge
