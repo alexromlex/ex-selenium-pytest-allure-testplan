@@ -229,3 +229,33 @@ def contact_page(class_driver, make_full_url):
     full_url = make_full_url(urls_data=valid_urls_data, page="contact")
     page.load_page(full_url)
     return page
+
+
+# #######################
+# Security
+# #######################
+
+SENSITIVE_PATTERNS = [os.getenv(val) for val in ['JWT_USERNAME', 'JWT_PASSWORD'] if os.getenv(val)]
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    """Mask sensitive data"""
+    outcome = yield
+    report = outcome.get_result()
+    
+    if report.failed and hasattr(call, 'excinfo'):
+        exc = call.excinfo.value
+        
+        if hasattr(exc, '__cause__') and exc.__cause__:
+            cause_msg = str(exc.__cause__)
+            for pattern in SENSITIVE_PATTERNS:
+                if pattern:
+                    cause_msg = cause_msg.replace(pattern, '******')
+            exc.__cause__ = type(exc.__cause__)(cause_msg)
+        
+        exc_msg = str(exc)
+        for pattern in SENSITIVE_PATTERNS:
+            if pattern:
+                exc_msg = exc_msg.replace(pattern, '******')
+        
+        report.longrepr = exc_msg
