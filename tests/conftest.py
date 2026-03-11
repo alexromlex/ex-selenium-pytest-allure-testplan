@@ -136,15 +136,6 @@ def pytest_html_results_table_row(report, cells):
     markers = getattr(report, "markers", "-")
     cells.insert(2, f'<td class="col-marker">{markers}</td>')
 
-@pytest.hookimpl(hookwrapper=True)
-def pytest_runtest_makereport(item, call):
-    outcome = yield
-    report = outcome.get_result()
-    if report.when == 'call':
-        # Собираем все маркеры теста
-        markers = [mark.name for mark in item.iter_markers()]
-        report.markers = ", ".join(markers) if markers else "-"
-
 @pytest.fixture(scope="session")
 def make_full_url(test_config):
     def _make(urls_data, page, params=None):
@@ -239,23 +230,29 @@ SENSITIVE_PATTERNS = [os.getenv(val) for val in ['JWT_USERNAME', 'JWT_PASSWORD']
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item, call):
-    """Mask sensitive data"""
     outcome = yield
     report = outcome.get_result()
     
-    if report.failed and hasattr(call, 'excinfo'):
-        exc = call.excinfo.value
+    # geather markers
+    if report.when == 'call':
+        # Собираем все маркеры теста
+        markers = [mark.name for mark in item.iter_markers()]
+        report.markers = ", ".join(markers) if markers else "-"
+    
+    # Mask sensitive data
+    # if report.failed and hasattr(call, 'excinfo'):
+    #     exc = call.excinfo.value
         
-        if hasattr(exc, '__cause__') and exc.__cause__:
-            cause_msg = str(exc.__cause__)
-            for pattern in SENSITIVE_PATTERNS:
-                if pattern:
-                    cause_msg = cause_msg.replace(pattern, '******')
-            exc.__cause__ = type(exc.__cause__)(cause_msg)
+    #     if hasattr(exc, '__cause__') and exc.__cause__:
+    #         cause_msg = str(exc.__cause__)
+    #         for pattern in SENSITIVE_PATTERNS:
+    #             if pattern:
+    #                 cause_msg = cause_msg.replace(pattern, '******')
+    #         exc.__cause__ = type(exc.__cause__)(cause_msg)
         
-        exc_msg = str(exc)
-        for pattern in SENSITIVE_PATTERNS:
-            if pattern:
-                exc_msg = exc_msg.replace(pattern, '******')
+    #     exc_msg = str(exc)
+    #     for pattern in SENSITIVE_PATTERNS:
+    #         if pattern:
+    #             exc_msg = exc_msg.replace(pattern, '******')
         
-        report.longrepr = exc_msg
+    #     report.longrepr = exc_msg

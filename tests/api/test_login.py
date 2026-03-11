@@ -3,6 +3,7 @@ import requests
 from test_data.login_data import valid_login_data, invalid_login_data
 from test_data.urls_data import valid_urls_data
 import allure
+from unittest.mock import patch
 
 
 @allure.epic("API")
@@ -35,6 +36,31 @@ class TestLoginAPI:
         assert json_data['token'] != ""
         assert 'user' in json_data
         assert json_data['user']['username'] == valid_login_data["username"]
+        
+        
+    @allure.id("24")
+    @pytest.mark.security
+    def test_login_connection_error(self, session, full_url):
+        def mock_post(*args, **kwargs):
+            # Mock ConnectionError
+            import urllib3.exceptions
+            error = urllib3.exceptions.ProtocolError(
+                "Connection aborted", 
+                ConnectionResetError(104, 'Connection reset by peer')
+            )
+            raise requests.exceptions.ConnectionError(error)
+    
+        with patch.object(session, 'post', side_effect=mock_post):
+            with allure.step("Post data"):
+                response = session.post(full_url, data=valid_login_data)
+                assert response.status_code == 200
+                json_data = response.json()
+                assert json_data['success'] is True
+            with allure.step("Verify and validate token"):
+                assert 'token' in json_data
+                assert json_data['token'] != ""
+                assert 'user' in json_data
+                assert json_data['user']['username'] == valid_login_data["username"]
     
     @allure.id("17")
     @pytest.mark.negative
