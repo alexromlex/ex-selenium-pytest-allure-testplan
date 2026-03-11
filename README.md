@@ -1,10 +1,11 @@
-# Automated Website Testing (pytest, selenium, allure)
+<div align="center"><h1>Automated Website Testing</h1> <p>(pytest, selenium, allure)</p></div>
 
 [![GitHub Actions](https://img.shields.io/badge/GitHub-Actions-blue?logo=github-actions)](https://github.com/features/actions)
 [![Python](https://img.shields.io/badge/Python-3.x-blue?logo=python)](https://www.python.org/)
 [![Selenium](https://img.shields.io/badge/Selenium-4.x-green?logo=selenium)](https://www.selenium.dev/)
 [![Allure](https://img.shields.io/badge/Allure-3.x-orange?logo=allure)](https://allurereport.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 
 ## 📋 Overview
 
