@@ -1,1 +1,1 @@
-{"tests":[{"id":"16","name":"test_login_success","labels":[{"epic":"API"},{"feature":"User can login"}],"markers":["positive","security"]}],"query":{"id":{"eq":"16"}}}
+{"tests":[{"id":"24","name":"test_login_connection_error","labels":[{"epic":"API"},{"feature":"User can login"}],"markers":["security"]}],"query":{"id":{"eq":"24"}}}
