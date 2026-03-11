@@ -1,4 +1,4 @@
-<div align="center"><h1>Automated Website Testing</h1> <p>(pytest, selenium, allure)</p></div>
+<div align="center"><h1>Automated Website Testing by Testplan</h1> <p>(pytest, selenium, allure)</p></div>
 
 [![GitHub Actions](https://img.shields.io/badge/GitHub-Actions-blue?logo=github-actions)](https://github.com/features/actions)
 [![Python](https://img.shields.io/badge/Python-3.x-blue?logo=python)](https://www.python.org/)
