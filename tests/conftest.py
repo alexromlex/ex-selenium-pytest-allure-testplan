@@ -240,19 +240,29 @@ def pytest_runtest_makereport(item, call):
         report.markers = ", ".join(markers) if markers else "-"
     
     # Mask sensitive data
-    if report.failed and hasattr(call, 'excinfo'):
-        exc = call.excinfo.value
+    # if report.failed and hasattr(call, 'excinfo'):
+    #     exc = call.excinfo.value
         
-        if hasattr(exc, '__cause__') and exc.__cause__:
-            cause_msg = str(exc.__cause__)
-            for pattern in SENSITIVE_PATTERNS:
-                if pattern:
-                    cause_msg = cause_msg.replace(pattern, '******')
-            exc.__cause__ = type(exc.__cause__)(cause_msg)
+    #     if hasattr(exc, '__cause__') and exc.__cause__:
+    #         cause_msg = str(exc.__cause__)
+    #         for pattern in SENSITIVE_PATTERNS:
+    #             if pattern:
+    #                 cause_msg = cause_msg.replace(pattern, '******')
+    #         exc.__cause__ = type(exc.__cause__)(cause_msg)
         
-        exc_msg = str(exc)
-        for pattern in SENSITIVE_PATTERNS:
-            if pattern:
-                exc_msg = exc_msg.replace(pattern, '******')
+    #     exc_msg = str(exc)
+    #     for pattern in SENSITIVE_PATTERNS:
+    #         if pattern:
+    #             exc_msg = exc_msg.replace(pattern, '******')
         
-        report.longrepr = exc_msg
+    #     report.longrepr = exc_msg
+    if report.failed and hasattr(report, 'longrepr'):
+        # Преобразуем лог в строку
+        log_text = str(report.longrepr)
+        
+        # Маскируем каждое чувствительное значение
+        for val in SENSITIVE_PATTERNS:
+            log_text = log_text.replace(val, '******')
+        
+        # Заменяем замаскированным текстом
+        report.longrepr = log_text
