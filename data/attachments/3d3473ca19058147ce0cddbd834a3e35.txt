@@ -1,2 +1,0 @@
-Page: get_scode Method: GET Url: https://www.romlex.hu/api/scode.php
-status_code:  401

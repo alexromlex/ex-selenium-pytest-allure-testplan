@@ -1,2 +1,0 @@
-Page: blog Method: GET Url: https://www.romlex.hu/cikkek
-status_code:  200
