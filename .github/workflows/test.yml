@@ -101,12 +101,17 @@ jobs:
       
       - name: Copy historical files for Pages
         run: |
-          git fetch origin gh-pages --depth=1
-
-          git checkout origin/gh-pages -- history.jsonl 2>/dev/null
-          if [ -f history.jsonl ]; then
-            cat history.jsonl | docker exec -i chrome-tests sh -c 'cat > /app/history.jsonl'
-            echo "=== FILE history.jsonl REPLACED ==="
+          git fetch origin gh-pages --depth=1 2>/dev/null || echo "Fetch history fail failed"
+          if git ls-tree -r origin/gh-pages 2>/dev/null | grep -q "history.jsonl"; then
+            git checkout origin/gh-pages -- history.jsonl 2>/dev/null || true
+            if [ -f history.jsonl ]; then
+              cat history.jsonl | docker exec -i chrome-tests sh -c 'cat > /app/history.jsonl'
+              echo "=== FILE history.jsonl REPLACED ==="
+            fi
+          else
+            echo "history.jsonl not found in gh-pages (branch is empty or file missing)"
+            touch history.jsonl
+            echo "=== EMPTY FILE history.jsonl CREATED ==="
           fi
           
       - name: Set Allure-report permissions
