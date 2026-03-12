@@ -1,1 +1,0 @@
-✓ All properties verified: ['maxlength', 'minlength']
