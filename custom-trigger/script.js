@@ -32,9 +32,7 @@ async function checkForRunningActions() {
         if(data.workflow_runs){
             const running = data.workflow_runs.some(run => ['queued', 'in_progress'].includes(run.status));
             if(running) {
-                showStatus('Tests are currently running...', 'info', 10);
-                runBtn.disabled = true;
-                runBtn.innerHTML = '<span class="loader"></span> Running...';
+                showStatus('Tests already running... please try later!', 'info', 10);
                 return true;
             } 
         }
@@ -195,7 +193,7 @@ async function runTests() {
     const isRunning = await checkForRunningActions();
     console.log('Running workflow? ', isRunning);
     if (isRunning) return;
-
+    
     runBtn.disabled = true;
     runBtn.innerHTML = '<span class="loader"></span> Running...';
     showStatus('Run test started...', 'info', 60);
