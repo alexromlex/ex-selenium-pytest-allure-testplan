@@ -210,19 +210,23 @@ async function runTests() {
             runBtn.disabled = false;
             runBtn.innerHTML = 'Run testplan';
             showStatus('Failed to start workflow: ' + response.statusText, 'error', 10);
-            throw new Error('Network response was not ok');
+            return;
         }
         return response.json();
     })
     .then(data => {
-        console.log('[runTests] response Data: ', data);
+        if (data.status_code !== 200) {
+            runBtn.disabled = false;
+            runBtn.innerHTML = 'Run testplan';
+            showStatus('Failed to start workflow: ' + data.response, 'error', 10);
+            return;
+        }
         if (data.run_id) {
             currentRunId = data.run_id;
-            showStatus(`Workflow (${currentRunId}) started...`, 'info', 90);
+            showStatus(`Workflow (${currentRunId}) started...`, 'info', 140);
             runBtn.disabled = true;
             runBtn.innerHTML = '<span class="loader"></span> Running...';
-            refreshInterval = setInterval(() => checkWorkflowStatus(currentRunId), 90000);
-            // checkWorkflowStatus(currentRunId);
+            refreshInterval = setInterval(() => checkWorkflowStatus(currentRunId), 70000);
         }
     })
     .catch(error => {
@@ -249,7 +253,6 @@ async function checkWorkflowStatus(runId) {
         runBtn.disabled = true;
         runBtn.innerHTML = 'Run testplan';
         clearInterval(refreshInterval);
-        // loadResults(); // загружаем результаты
         window.parent.location.href = 'https://alexromlex.github.io/ex-selenium-pytest-allure-testplan/';
     } else {
         showStatus(`Status: ${data.status}`, 'warning', 10);
