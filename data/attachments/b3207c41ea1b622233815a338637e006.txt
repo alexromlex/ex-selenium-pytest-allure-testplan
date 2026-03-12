@@ -1,0 +1,2 @@
+Page: get_partners Method: GET Url: https://www.romlex.hu/api/get_partners.php
+status_code:  401
