@@ -23,7 +23,7 @@ valid_emails = [
 invalid_emails = [
     '',
     'a@ur',     # minlen 5
-    'plainaddress'
+    'plainaddress',
     '#@%^%#$@#$@#.com',
     '@example.com',
     'Joe Smith <email@example.com>',
