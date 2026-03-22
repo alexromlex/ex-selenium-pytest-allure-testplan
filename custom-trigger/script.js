@@ -1,12 +1,9 @@
-// State
 let lastTimestamp = null;
 let refreshInterval = null;
 let currentRunId = null;
 let checkInterval = null;
 const all_tests = [];
 
-
-// Load saved results on startup
 document.addEventListener('DOMContentLoaded', () => {
     const content = document.getElementById('collapseContent');
     const icon = document.getElementById('collapseIcon');
@@ -16,8 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
     loadResults();
 });
 
-
-// Start auto-refresh every 1.5 minutes
 function startAutoRefresh() {
     if (refreshInterval) clearInterval(refreshInterval);
     refreshInterval = setInterval(loadResults, 90000);
@@ -111,7 +106,7 @@ function createTestElement(test) {
     const div = document.createElement('div');
     div.className = 'test-item';
     
-    // Test ID and name
+    // Test group ID and name
     const header = document.createElement('div');
     header.className = 'test-header';
     header.innerHTML = `<span class="test-name">[${test.id}] ${test.name}</span>
