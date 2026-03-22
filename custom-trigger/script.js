@@ -315,7 +315,6 @@ class TestFilter {
             return results;
         }
         
-        // Обычный объект - строгий поиск
         return this._strictFilter(filters);
     }
     _strictFilter(filters) {
@@ -351,7 +350,7 @@ class TestFilter {
                     if (!this._evaluate(value, labelCondition)) return false;
                 }
             } else {
-                // Неизвестное поле
+                // Unknoun param
                 return false;
             }
         }
