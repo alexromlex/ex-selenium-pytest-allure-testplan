@@ -350,7 +350,7 @@ class TestFilter {
                     if (!this._evaluate(value, labelCondition)) return false;
                 }
             } else {
-                // Unknoun param
+                // Unknoun key
                 return false;
             }
         }
